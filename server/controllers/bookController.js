@@ -17,10 +17,10 @@ export const addBook = catchAsyncErrors(async (req, res, next) => {
 });
 
 export const getAllBook = catchAsyncErrors(async (req, res, next) => {
-    const books = await Book.find();
-    if(!books || books.length === 0){
-        return next(new ErrorHandler("No books found", 404));
-    }
+    const books = await Book.find({});
+    // if(!books || books.length === 0){
+    //     return next(new ErrorHandler("No books found", 404));
+    // }
     res.status(200).json({
         success: true,
         count:books.length,

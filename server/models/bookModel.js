@@ -26,6 +26,11 @@ const bookSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    category:{
+        type: String,
+        default: "General",
+        
+    }
 
 },{
     timestamps: true,

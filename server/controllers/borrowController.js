@@ -96,10 +96,10 @@ export const returnBorrowBook = catchAsyncErrors(async (req, res, next) => {
 });
     
 export const borrowedBooks = catchAsyncErrors(async (req, res, next) => {
-    const { borrowedBooks } = req.user;
+    // const { borrowedBooks } = req.user;
     res.status(200).json({
         success: true,
-        borrowedBooks,
+        borrowedBooks: req.user.borrowedBooks || [],
     });
 });
 export const getBorrowedBooksForAdmin = catchAsyncErrors(async (req, res, next) => {
