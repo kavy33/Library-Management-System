@@ -26,6 +26,8 @@ import { getUser } from "./store/slices/authSlice.js";
 import { fetchAllBooks } from "./store/slices/bookSlice.js";
 import { fetchAllUsers } from "./store/slices/userSlice.js";
 import { fetchAllBorrowedBooks, fetchUserBorrowedBooks } from "./store/slices/borrowSlice.js";
+import Deposit from "./pages/Deposit.jsx";
+
 
 const App = () => {
   const { user } = useSelector((state) => state.auth);
@@ -83,6 +85,7 @@ const App = () => {
           />
 
           <Route path="books" element={<BookManagement />} />
+           <Route path="deposit" element={<Deposit />} /> 
           <Route path="catalog" element={<Catalog />} />
           <Route path="users" element={<Users />} />
           <Route path="my-borrowed-books" element={<MyBorrowedBooks />} />

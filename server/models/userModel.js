@@ -27,6 +27,11 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    // 🔐 payment & rent rules
+  depositPaid: {
+    type: Boolean,
+    default: false,
+  },
     borrowedBooks:[{
         bookId:{
             type: mongoose.Schema.Types.ObjectId,
@@ -45,11 +50,18 @@ const userSchema = new mongoose.Schema({
         public_id: String,
         url: String,
     },
+      rentedBooks: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Book",
+    },
+  ],
     verificationCode: Number,
     verificationCodeExpire: Date,
     resetPasswordToken: String,
     resetPasswordExpire: Date,
 },
+
 {
     timestamps: true,
 }

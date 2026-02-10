@@ -6,6 +6,7 @@ import Header from "../layout/Header";
 import ReadBookPopup from "../popups/ReadBookPopup";
 import { fetchUserBorrowedBooks } from "../store/slices/borrowSlice";
 import { useLocation } from "react-router-dom";
+import { deleteBook } from "../store/slices/bookSlice";
 
 
 
@@ -19,7 +20,15 @@ import { bookCategories } from "../utils/bookCategories";//categories
 const MyBorrowedBooks = () => {
   const location = useLocation();
 
+
+
   const dispatch = useDispatch();
+
+const handleDelete = (id) => {
+  if (window.confirm("Are you sure you want to delete this book?")) {
+    dispatch(deleteBook(id));
+  }
+};
 
   const { books } = useSelector((state) => state.book);
   const { userBorrowedBooks } = useSelector((state) => state.borrow);

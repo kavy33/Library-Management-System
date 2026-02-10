@@ -1,4 +1,6 @@
+import { config } from "dotenv";
 import { app } from "./app.js";
+config({ path: "./config/config.env" });
 import { v2 as cloudinary } from "cloudinary";
 
 cloudinary.config({

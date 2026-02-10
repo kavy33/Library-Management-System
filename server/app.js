@@ -13,9 +13,11 @@ import userRouter from "./routes/userRouter.js";
 import expressFileupload from "express-fileupload";
 import { notifyUsers } from "./services/notifyUsers.js";
 import { removeUnverifiedAccounts } from "./services/removeUnverifiedAccounts.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
 
 
-config({ path: "./config/config.env" });
+
+
 
 export const app = express();
 app.use(cors({
@@ -36,6 +38,8 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/book", bookRouter);
 app.use("/api/v1/borrow", borrowRouter);
 app.use("/api/v1/user", userRouter);
+app.use("/api/payment", paymentRoutes);
+
 
 notifyUsers();
 removeUnverifiedAccounts();

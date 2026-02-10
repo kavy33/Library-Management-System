@@ -29,7 +29,7 @@ export const getAllBook = catchAsyncErrors(async (req, res, next) => {
 });
 export const deleteBook = catchAsyncErrors(async (req, res, next) => {
     const {id} = req.params;
-    const book = await Book.findById(id);
+     const book = await Book.findById(id);
     if(!book){
         return next(new ErrorHandler("Book not found", 404));
     }

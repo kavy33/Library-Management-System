@@ -37,6 +37,10 @@ const borrowSchema = new mongoose.Schema({
         type: Date,
         default: null,
     },
+     returned: {
+    type: Boolean,
+    default: false,
+  },
     fine:{
         type: Number,
         default: 0,

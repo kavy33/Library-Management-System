@@ -30,7 +30,20 @@ const bookSchema = new mongoose.Schema({
         type: String,
         default: "General",
         
-    }
+    },
+    waitingQueue: [
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    email: String,
+    joinedAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+],
 
 },{
     timestamps: true,
