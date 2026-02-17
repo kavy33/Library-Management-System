@@ -8,7 +8,7 @@ const ReturnBookPopup = ({ email,bookId}) => {
   const dispatch = useDispatch();
   const handleReturnBook = (e)=>{
     e.preventDefault();
-    dispatch(returnBook(email,bookId));
+    dispatch(returnBook(bookId));
     dispatch(toggleReturnBookPopup());
   }
   return (

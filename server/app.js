@@ -14,6 +14,7 @@ import expressFileupload from "express-fileupload";
 import { notifyUsers } from "./services/notifyUsers.js";
 import { removeUnverifiedAccounts } from "./services/removeUnverifiedAccounts.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
+config();
 
 
 
@@ -21,7 +22,7 @@ import paymentRoutes from "./routes/paymentRoutes.js";
 
 export const app = express();
 app.use(cors({
-    origin: [process.env.FRONTEND_URL],
+    origin: process.env.FRONTEND_URL,
     methods: ["GET","POST","PUT","DELETE"],
     credentials: true,
 }));

@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toggleRecordBookPopup } from "./popUpSlice";
+import { toast } from "react-toastify";
 
 
 const borrowSlice = createSlice({
@@ -156,19 +157,33 @@ export const recordBorrowBookByAdmin = (email, id) => async (dispatch) => {
 
 
 
-export const returnBook = (email,id)=>async(dispatch)=>{
-    dispatch(borrowSlice.actions.returnBookRequest());
-    await axios.put(`http://localhost:4000/api/v1/borrow/return-borrowed-book/${id}`,{email},{withCredentials:true,
-        headers:{
-            "Content-Type":"application/json"
-        }
-    }).then(res=>{
-        dispatch(borrowSlice.actions.returnBookSuccess(res.data.message));
-    }).catch(err=>{
-        dispatch(borrowSlice.actions.returnBookFailed(err.response.data.message));
-    });
+export const returnBook = (borrowId) => async (dispatch) => {
+  dispatch(borrowSlice.actions.returnBookRequest());
 
-}
+  try {
+    const { data } = await axios.put(
+      `http://localhost:4000/api/v1/borrow/return-borrowed-book/${borrowId}`,
+      {},
+      { withCredentials: true }
+    );
+
+    dispatch(borrowSlice.actions.returnBookSuccess(data.message));
+
+    // 🔥 SHOW TOAST HERE DIRECTLY
+    toast.success(data.message);
+
+    dispatch(fetchAllBorrowedBooks());
+
+  } catch (error) {
+    const errMsg =
+      error.response?.data?.message || "Something went wrong";
+
+    dispatch(borrowSlice.actions.returnBookFailed(errMsg));
+
+    toast.error(errMsg);
+  }
+};
+
 
 export const resetBorrowSlice =()=>(dispatch)=>{
     dispatch(borrowSlice.actions.resetBorrowSlice());

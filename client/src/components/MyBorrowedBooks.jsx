@@ -41,6 +41,20 @@ const handleDelete = (id) => {
         dispatch(toggleReadBookPopup()); 
       };
 
+useEffect(() => {
+  const interval = setInterval(() => {
+    dispatch(fetchUserBorrowedBooks());
+  }, 3000); // every 3 seconds
+
+  return () => clearInterval(interval);
+}, [dispatch]);
+
+
+
+
+
+
+
       // ✅ FETCH BORROWED BOOKS ON PAGE LOAD
 useEffect(() => {
   dispatch(fetchUserBorrowedBooks());

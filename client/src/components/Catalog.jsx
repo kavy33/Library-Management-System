@@ -64,6 +64,17 @@ const Catalog = () => {
     dispatch(toggleReturnBookPopup());
   };
 
+
+useEffect(() => {
+  const interval = setInterval(() => {
+    dispatch(fetchAllBorrowedBooks());
+  }, 3000); // every 3 sec
+
+  return () => clearInterval(interval);
+}, [dispatch]);
+
+
+
   useEffect(()=>{
     if(message){
       toast.success(message);
@@ -71,14 +82,14 @@ const Catalog = () => {
       dispatch(fetchAllBorrowedBooks());
       dispatch(resetBookSlice());
       dispatch(resetBorrowSlice());
-      dispatch(resetBorrowSlice());
+    
     }
 
     if(error){
       toast.error(error);
       dispatch(resetBorrowSlice());
     }
-  },[dispatch, error, loading]);
+  },[ error, message, dispatch]);
 
 
   return <>
@@ -133,7 +144,7 @@ const Catalog = () => {
                           <FaSquareCheck className="w-6 h-6"/>
                         ) : (
                           <PiKeyReturnBold onClick={()=> 
-                            openReturnBookPopup(book.book, book?.user.email)
+                            openReturnBookPopup(book._id, book?.user.email)
                           } className="w-6 h-6"/>
                         )
                        }

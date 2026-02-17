@@ -97,57 +97,73 @@ export const recordBorrowedBook = catchAsyncErrors(async (req, res, next) => {
  * 📗 RETURN BOOK
  */
 export const returnBorrowBook = catchAsyncErrors(async (req, res, next) => {
-  const { bookId } = req.params;
-  const userId = req.user._id;
+  const { borrowId } = req.params;
 
-  const book = await Book.findById(bookId);
-  if (!book) {
-    return next(new ErrorHandler("Book not found.", 404));
+  // 🔍 Find borrow record first
+  const borrow = await Borrow.findById(borrowId);
+
+  if (!borrow) {
+    return next(new ErrorHandler("Borrow record not found.", 404));
   }
 
-  const user = await User.findById(userId);
+  if (borrow.returnDate) {
+    return next(new ErrorHandler("Book already returned.", 400));
+  }
+
+  // 🔍 Find book
+  // 🔍 Find book
+const book = await Book.findById(borrow.book);
+
+if (!book) {
+  // Book was deleted but borrow record exists
+  borrow.returnDate = new Date();
+  borrow.fine = calculateFine(borrow.dueDate);
+  await borrow.save();
+
+  return res.status(200).json({
+    success: true,
+    message: "Book returned (original book record was removed).",
+  });
+}
+
+
+  // 🔍 Find actual user who borrowed
+  const user = await User.findById(borrow.user.id);
   if (!user) {
     return next(new ErrorHandler("User not found.", 404));
   }
 
-  // 🔍 Find borrowed book
+  // 🔍 Find borrowed book in user document
   const borrowedBook = user.borrowedBooks.find(
-    (b) => b.bookId.toString() === bookId && b.returned === false
+    (b) =>
+      b.bookId.toString() === book._id.toString() &&
+      b.returned === false
   );
 
   if (!borrowedBook) {
     return next(new ErrorHandler("This book was not borrowed.", 400));
   }
 
-  // ✅ Mark returned
+  // ✅ Mark returned in user
   borrowedBook.returned = true;
 
   // 🧹 Remove from rentedBooks
   user.rentedBooks = user.rentedBooks.filter(
-    (id) => id.toString() !== bookId
+    (id) => id.toString() !== book._id.toString()
   );
 
   await user.save();
 
-  // 📈 Update book stock
+  // 📈 Increase stock
   book.quantity += 1;
   book.availability = true;
   await book.save();
 
-  // 🔍 Update borrow record
-  const borrow = await Borrow.findOne({
-    book: book._id,
-    "user.id": user._id,
-    returnDate: null,
-  });
-
-  if (!borrow) {
-    return next(new ErrorHandler("Borrow record not found.", 404));
-  }
-
+  // 💰 Calculate fine
   borrow.returnDate = new Date();
   const fine = calculateFine(borrow.dueDate);
   borrow.fine = fine;
+
   await borrow.save();
 
   res.status(200).json({
@@ -159,6 +175,7 @@ export const returnBorrowBook = catchAsyncErrors(async (req, res, next) => {
     fine,
   });
 });
+
 
 /**
  * 📚 USER → MY BORROWED BOOKS
