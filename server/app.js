@@ -40,6 +40,8 @@ app.use("/api/v1/book", bookRouter);
 app.use("/api/v1/borrow", borrowRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/payment", paymentRoutes);
+app.use("/uploads", express.static("uploads"));
+
 
 
 notifyUsers();

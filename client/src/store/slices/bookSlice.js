@@ -67,15 +67,17 @@ export const fetchAllBooks = () => async (dispatch) => {
 };
 
 // 🔹 ADD BOOK
-export const addBook = (data) => async (dispatch) => {
+export const addBook = (formData) => async (dispatch) => {
   dispatch(bookSlice.actions.addBookRequest());
   try {
     const { data: resData } = await axios.post(
       "http://localhost:4000/api/v1/book/admin/add",
-      data,
+      formData,
       {
         withCredentials: true,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       }
     );
 
@@ -91,6 +93,7 @@ export const addBook = (data) => async (dispatch) => {
     );
   }
 };
+
 
 // 🔹 DELETE BOOK ✅
 export const deleteBook = (id) => async (dispatch) => {

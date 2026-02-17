@@ -10,8 +10,8 @@ import { deleteBook } from "../store/slices/bookSlice";
 
 
 
-import { bookImages } from "../utils/bookImages"; //img
-import { bookCategories } from "../utils/bookCategories";//categories
+// import { bookImages } from "../utils/bookImages"; //img
+// import { bookCategories } from "../utils/bookCategories";//categories
 
 
 
@@ -130,12 +130,13 @@ const booksToDisplay = baseBooks.filter((book) => {
     .includes(searchedKeyword);
 
   // 🏷 CATEGORY
-  const bookCategory =
-    bookCategories[book.bookTitle] || "General";
+  // find full book from books collection
+const fullBook = books.find(b => b._id === book.bookId);
 
-  const matchesCategory =
-    selectedCategory === "All" ||
-    bookCategory === selectedCategory;
+const matchesCategory =
+  selectedCategory === "All" ||
+  fullBook?.category === selectedCategory;
+
 
   return matchesSearch && matchesCategory;
 });
@@ -218,19 +219,16 @@ const booksToDisplay = baseBooks.filter((book) => {
                   <tr key={index} className={(index + 1) % 2 === 0 ? "bg-gray-50" : ""}
                   > 
 
-         <td className="px-4 py-2">
-           <img
-             src={bookImages[book.bookTitle] || "/book-placeholder.png"}
-             alt={book.bookTitle}
-             className=" w-24 h-36 
-           object-cover 
-           rounded-lg 
-           shadow-md 
-           transition-transform 
-           duration-300 
-           hover:scale-105"
-           />
-         </td>
+        <td className="px-4 py-2">
+  <img
+    src={
+      books.find(b => b._id === book.bookId)?.image?.url ||
+      "/book-placeholder.png"
+    }
+    alt={book.bookTitle}
+    className="w-24 h-36 object-cover rounded-lg shadow-md transition-transform duration-300 hover:scale-105"
+  />
+</td>
 
 
 

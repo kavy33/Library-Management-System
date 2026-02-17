@@ -8,9 +8,14 @@ import { toast } from "react-toastify";
 
 
 
+
+
 const AddBookPopup = () => {
   const dispatch = useDispatch();
   // const {message, loading} = useSelector((state) => state.book);
+
+  const [image, setImage] = useState(null);
+
 
 
   const [title, setTitle] = useState("");
@@ -31,7 +36,11 @@ const AddBookPopup = () => {
            formData.append("quantity", quantity);
             formData.append("description", description);
 
-            formData.append("category", category); // ✅ NEW
+            formData.append("category", category); 
+
+            if(image){
+              formData.append("image", image);
+            }
 
             dispatch(addBook(formData));
            
@@ -114,6 +123,21 @@ const AddBookPopup = () => {
     <option value="Romance">Romance</option>
     <option value="Biography">Biography</option>
   </select>
+</div>
+
+
+
+<div className="mb-4">
+  <label className="block text-gray-900 font-medium">
+    Book Image
+  </label>
+  <input
+    type="file"
+    accept="image/*"
+    onChange={(e) => setImage(e.target.files[0])}
+    className="w-full px-4 py-2 border-2 border-black rounded-md"
+    required
+  />
 </div>
 
 

@@ -1,3 +1,4 @@
+import { urlencoded } from "express";
 import mongoose from "mongoose";
 const bookSchema = new mongoose.Schema({
     title:{
@@ -26,11 +27,28 @@ const bookSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
-    category:{
-        type: String,
-        default: "General",
-        
-    },
+    category: {
+  type: String,
+  required: true,
+  enum: [
+    "Programming",
+    "Web Development",
+    "Computer Science",
+    "AI / ML",
+    "Fiction",
+    "Romance",
+    "Biography",
+    "General"
+  ],
+  default: "General",
+},
+
+ image: {
+   public_id: String,
+   url: String,
+},
+
+
     waitingQueue: [
   {
     user: {

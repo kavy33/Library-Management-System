@@ -305,8 +305,7 @@ import Header from "../layout/Header";
 import AddBookPopup from "../popups/AddBookPopup";
 import ReadBookPopup from "../popups/ReadBookPopup";
 import RecordBookPopup from "../popups/RecordBookPopup";
-import { bookImages } from "../utils/bookImages";
-import { bookCategories } from "../utils/bookCategories";
+
 import { useNavigate } from "react-router-dom";
 
 const BookManagement = () => {
@@ -403,10 +402,11 @@ const BookManagement = () => {
       .toLowerCase()
       .includes(searchedKeyword.toLowerCase());
 
-    const bookCategory = bookCategories[book.title] || "General";
+   
 
-    const matchesCategory =
-      selectedCategory === "All" || bookCategory === selectedCategory;
+   const matchesCategory =
+   selectedCategory === "All" || book.category === selectedCategory;
+
 
     return matchesSearch && matchesCategory;
   });
@@ -478,11 +478,12 @@ const BookManagement = () => {
               {searchedBooks.map((book, index) => (
                 <tr key={book._id} className="border-t">
                   <td className="px-4 py-2">
-                    <img
-                      src={bookImages[book.title] || "/book-placeholder.png"}
-                      className="w-20 h-28 object-cover rounded"
-                      alt={book.title}
-                    />
+                   <img
+                       src={book.image?.url || "/book-placeholder.png"}
+                       className="w-20 h-28 object-cover rounded"
+                       alt={book.title}
+                   />
+
                   </td>
                   <td className="px-4 py-2">{index + 1}</td>
                   <td className="px-4 py-2">{book.title}</td>
