@@ -4,6 +4,9 @@ import { Borrow } from "../models/borrowModel.js";
 import { Book } from "../models/bookModel.js";
 import { User } from "../models/userModel.js";
 import { calculateFine } from "../utils/fineCalculator.js";
+import { sendEmail } from "../utils/sendEmail.js";
+
+
 
 /**
  * 📕 BORROW / GET BOOK
@@ -49,10 +52,41 @@ export const recordBorrowedBook = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Book already borrowed.", 400));
   }
 
+
+
+
+
+
   // 📦 Stock check
-//   if (book.quantity === 0) {
-//     return next(new ErrorHandler("Book is currently unavailable.", 400));
-//   }
+// 📦 Stock check with queue system
+if (book.quantity <= 0) {
+
+  // Check if already in queue
+  const alreadyInQueue = book.waitingQueue.find(
+    (item) => item.user.toString() === user._id.toString()
+  );
+
+  if (alreadyInQueue) {
+    return next(new ErrorHandler("You are already in waiting queue.", 400));
+  }
+
+  book.waitingQueue.push({
+    user: user._id,
+    email: user.email,
+  });
+
+  await book.save();
+
+  return res.status(200).json({
+    success: true,
+    message: "Book unavailable. You have been added to waiting queue.",
+  });
+}
+
+
+
+
+
 
   // 📉 Update book stock
   book.quantity -= 1;
@@ -154,10 +188,28 @@ if (!book) {
 
   await user.save();
 
-  // 📈 Increase stock
-  book.quantity += 1;
-  book.availability = true;
-  await book.save();
+ // 📈 Increase stock
+book.quantity += 1;
+book.availability = true;
+
+// 🔥 If someone waiting, notify first user
+if (book.waitingQueue.length > 0) {
+
+  const nextUser = book.waitingQueue[0];
+
+  // Send email
+  await sendEmail({
+    email: nextUser.email,
+    subject: "📚 Book Available Now",
+    message: `Good news! The book "${book.title}" is now available for rent. Please login and borrow it before others.`,
+  });
+
+  // Remove from queue
+  book.waitingQueue.shift();
+}
+
+await book.save();
+
 
   // 💰 Calculate fine
   borrow.returnDate = new Date();

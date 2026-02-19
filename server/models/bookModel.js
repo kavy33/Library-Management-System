@@ -36,6 +36,7 @@ const bookSchema = new mongoose.Schema({
     "Computer Science",
     "AI / ML",
     "Fiction",
+    "Non-Fiction self-help",
     "Romance",
     "Biography",
     "General"
@@ -66,4 +67,5 @@ const bookSchema = new mongoose.Schema({
 },{
     timestamps: true,
 });
+bookSchema.index({ title: 1, author: 1 }, { unique: true });
 export const Book = mongoose.model("Book", bookSchema);

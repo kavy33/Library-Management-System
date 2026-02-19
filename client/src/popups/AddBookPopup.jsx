@@ -120,6 +120,7 @@ const AddBookPopup = () => {
     <option value="AI / ML">AI / ML</option>
     <option value="Computer Science">Computer Science</option>
     <option value="Fiction">Fiction</option>
+     <option value="Non-Fiction self-help">Non-Fiction self-help</option>
     <option value="Romance">Romance</option>
     <option value="Biography">Biography</option>
   </select>

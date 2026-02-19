@@ -307,10 +307,19 @@ import ReadBookPopup from "../popups/ReadBookPopup";
 import RecordBookPopup from "../popups/RecordBookPopup";
 
 import { useNavigate } from "react-router-dom";
+import EditBookPopup from "../popups/EditBookPopup";
 
 const BookManagement = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const [editBook, setEditBook] = useState(null);
+const [editPopup, setEditPopup] = useState(false);
+const openEditPopup = (book) => {
+  setEditBook(book);
+  setEditPopup(true);
+};
+
 
   const { books, loading, error, message } = useSelector(
     (state) => state.book
@@ -450,6 +459,7 @@ const BookManagement = () => {
               <option value="AI / ML">AI / ML</option>
               <option value="Computer Science">Computer Science</option>
               <option value="Fiction">Fiction</option>
+               <option value="Non-Fiction self-help">Non-Fiction self-help</option>
               <option value="Romance">Romance</option>
               <option value="Biography">Biography</option>
             </select>
@@ -496,22 +506,34 @@ const BookManagement = () => {
                   <td className="px-4 py-2">₹{book.price}</td>
                   <td className="px-4 py-2">
                     {book.availability ? "Available" : "Unavailable"}
+                    
+                    {!book.availability && (
+                                <p className="text-sm text-red-500">
+                                {book.waitingQueue?.length || 0} people waiting
+                               </p>
+                   )}
                   </td>
 
                   <td className="px-4 py-2">
                     <div className="flex justify-center gap-4">
-                      {user?.role === "User" && book.availability && (
-                        <button
-  onClick={() => handleGetBook(book._id)}
-  className={`px-3 py-1 rounded text-white ${
-    !user.depositPaid || user.rentedBooks.length >= 3
-      ? "bg-gray-400 cursor-not-allowed"
-      : "bg-black"
-  }`}
->
-  GET
-</button>
-                      )}
+                      {user?.role === "User" && (
+  book.availability ? (
+    <button
+      onClick={() => handleGetBook(book._id)}
+      className="bg-black text-white px-3 py-1 rounded"
+    >
+      GET
+    </button>
+  ) : (
+    <button
+      onClick={() => handleGetBook(book._id)}
+      className="bg-gray-600 text-white px-3 py-1 rounded"
+    >
+      Join Waiting List
+    </button>
+  )
+)}
+
 
                       {user?.role === "Admin" && (
                         <>
@@ -520,8 +542,8 @@ const BookManagement = () => {
                             className="cursor-pointer"
                           />
                           <NotebookPen
-                            onClick={() => openRecordBookPopup(book._id)}
-                            className="cursor-pointer"
+                            onClick={() =>  openEditPopup(book)}
+                            className="cursor-pointer text-blue-600"
                           />
                           <Trash2
                             onClick={() => handleDeleteBook(book._id)}
@@ -541,9 +563,18 @@ const BookManagement = () => {
       {addBookPopup && <AddBookPopup />}
       {readBookPopup && <ReadBookPopup book={readBook} />}
       {recordBookPopup && <RecordBookPopup bookId={borrowBookId} />}
+
+      {editPopup && (
+  <EditBookPopup
+    book={editBook}
+    close={() => setEditPopup(false)}
+  />
+)}
     </>
   );
 };
+
+
 
 export default BookManagement;
 

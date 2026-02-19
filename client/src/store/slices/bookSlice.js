@@ -115,5 +115,34 @@ export const deleteBook = (id) => async (dispatch) => {
   }
 };
 
+export const updateBook = (id, formData) => async (dispatch) => {
+  dispatch(bookSlice.actions.addBookRequest());
+
+  try {
+    const { data } = await axios.put(
+      `http://localhost:4000/api/v1/book/admin/update/${id}`,
+      formData,
+      {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    toast.success(data.message);
+    dispatch(bookSlice.actions.setMessage(data.message));
+    dispatch(fetchAllBooks());
+
+  } catch (err) {
+    dispatch(
+      bookSlice.actions.setError(
+        err.response?.data?.message || "Update failed"
+      )
+    );
+  }
+};
+
+
 export const { resetBookSlice } = bookSlice.actions;
 export default bookSlice.reducer;

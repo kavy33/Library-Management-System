@@ -4,6 +4,8 @@ import { toggleRecordBookPopup } from "./popUpSlice";
 import { toast } from "react-toastify";
 
 
+
+
 const borrowSlice = createSlice({
     name: "borrow",
     initialState:{
@@ -121,6 +123,9 @@ export const recordBorrowBook = (id, email)=>async(dispatch)=>{
 
     }).then(res=>{
         dispatch(borrowSlice.actions.recordBookSuccess(res.data.message));
+        
+        
+
         // dispatch(toggleRecordBookPopup());
     }).catch(err=>{
         dispatch(borrowSlice.actions.recordBookFailed(err.response.data.message));
@@ -141,6 +146,7 @@ export const recordBorrowBookByAdmin = (email, id) => async (dispatch) => {
     );
 
     dispatch(borrowSlice.actions.recordBookSuccess(data.message));
+   
   } catch (error) {
     dispatch(
       borrowSlice.actions.recordBookFailed(
@@ -173,7 +179,7 @@ export const returnBook = (borrowId) => async (dispatch) => {
     toast.success(data.message);
 
     dispatch(fetchAllBorrowedBooks());
-
+  
   } catch (error) {
     const errMsg =
       error.response?.data?.message || "Something went wrong";
