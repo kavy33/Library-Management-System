@@ -14,6 +14,7 @@ import expressFileupload from "express-fileupload";
 import { notifyUsers } from "./services/notifyUsers.js";
 import { removeUnverifiedAccounts } from "./services/removeUnverifiedAccounts.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
+import reportRoutes from "./routes/reportRoutes.js";
 config();
 
 
@@ -41,6 +42,7 @@ app.use("/api/v1/borrow", borrowRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/payment", paymentRoutes);
 app.use("/uploads", express.static("uploads"));
+app.use("/api/v1/reports", reportRoutes);
 
 
 

@@ -154,6 +154,9 @@ if (!book) {
   borrow.fine = calculateFine(borrow.dueDate);
   await borrow.save();
 
+  //
+  
+
   return res.status(200).json({
     success: true,
     message: "Book returned (original book record was removed).",
@@ -217,6 +220,35 @@ await book.save();
   borrow.fine = fine;
 
   await borrow.save();
+  //email notification at return with fine details
+  // 📧 Send return confirmation email
+await sendEmail({
+  email: user.email,
+  subject: "📚 Book Return Confirmation - BookWorm Library",
+  message: `
+Hello ${user.name},
+
+Your book "${book.title}" has been successfully returned.
+📅 Borrowed On: ${
+  borrow.borrowedDate
+    ? new Date(borrow.borrowedDate).toDateString()
+    : new Date(borrow.createdAt).toDateString()
+}
+
+📅 Returned On: ${
+  borrow.returnDate ? new Date(borrow.returnDate).toDateString() : "N/A"
+}
+💰 Rental Price: ₹${book.price}
+${fine > 0 ? `⚠ Late Fine: ₹${fine}` : "🎉 No Late Fine!"}
+
+Total Charge: ₹${fine > 0 ? fine + book.price : book.price}
+
+Thank you for using BookWorm Library.
+
+Regards,
+BookWorm Team
+  `,
+});
 
   res.status(200).json({
     success: true,

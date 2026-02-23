@@ -27,6 +27,7 @@ import { fetchAllBooks } from "./store/slices/bookSlice.js";
 import { fetchAllUsers } from "./store/slices/userSlice.js";
 import { fetchAllBorrowedBooks, fetchUserBorrowedBooks } from "./store/slices/borrowSlice.js";
 import Deposit from "./pages/Deposit.jsx";
+import AdminReports from "./pages/AdminReports";
 
 
 const App = () => {
@@ -97,6 +98,8 @@ const App = () => {
         <Route path="/password/forgot" element={<ForgotPassword />} />
         <Route path="/otp-verification/:email" element={<OTP />} />
         <Route path="/password/reset/:token" element={<ResetPassword />} />
+
+        <Route path="/admin/reports" element={<AdminReports />} />
 
       </Routes>
 

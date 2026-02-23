@@ -77,6 +77,14 @@ const SideBar = ({ isSideBarOpen, setIsSideBarOpen}) => {
             <img src={usersIcon} alt="icon" />
             <span>Users</span>
             </Link>
+
+            <Link
+  to="/admin/reports"
+  className="w-full py-2 font-medium bg-transparent rounded-md hover:cursor-pointer flex items-center space-x-2"
+>
+  <img src={dashboardIcon} alt="icon" />
+  <span>Reports</span>
+</Link>
           
            <button 
            className="w-full py-2 font-medium
