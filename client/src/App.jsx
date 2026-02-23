@@ -30,6 +30,7 @@ import Deposit from "./pages/Deposit.jsx";
 import AdminReports from "./pages/AdminReports";
 
 
+
 const App = () => {
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
@@ -90,6 +91,8 @@ const App = () => {
           <Route path="catalog" element={<Catalog />} />
           <Route path="users" element={<Users />} />
           <Route path="my-borrowed-books" element={<MyBorrowedBooks />} />
+
+          <Route path="admin/reports" element={<AdminReports />} />
         </Route>
 
         {/* Auth */}
@@ -98,8 +101,9 @@ const App = () => {
         <Route path="/password/forgot" element={<ForgotPassword />} />
         <Route path="/otp-verification/:email" element={<OTP />} />
         <Route path="/password/reset/:token" element={<ResetPassword />} />
+        
 
-        <Route path="/admin/reports" element={<AdminReports />} />
+       
 
       </Routes>
 

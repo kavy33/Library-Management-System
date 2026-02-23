@@ -1,7 +1,11 @@
 import express from "express";
-import { getAllUsers, registerNewAdmin } from "../controllers/userController.js";
+import { getAllUsers, registerNewAdmin, toggleUserBlock } from "../controllers/userController.js";
 import { isAuthenticated, isAuthorized } from "../middlewares/authMiddleware.js";
+
 const router = express.Router();
 router.get("/all", isAuthenticated, isAuthorized("Admin"), getAllUsers);
 router.post("/add/new-admin", isAuthenticated, isAuthorized("Admin"), registerNewAdmin);
+
+router.put("/block/:id",isAuthenticated,isAuthorized("Admin"),toggleUserBlock);
+
 export default router;

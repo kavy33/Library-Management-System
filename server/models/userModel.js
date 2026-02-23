@@ -23,6 +23,7 @@ const userSchema = new mongoose.Schema({
         enum: ["Admin","User"],
         default: "User",
     },
+  
     accountVerified: {
         type: Boolean,
         default: false,
@@ -32,6 +33,11 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  isBlocked: {
+       type: Boolean,
+       default: false,
+     },
+  
     borrowedBooks:[{
         bookId:{
             type: mongoose.Schema.Types.ObjectId,

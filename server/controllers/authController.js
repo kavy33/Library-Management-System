@@ -106,6 +106,17 @@ export const login = catchAsyncErrors(async (req, res, next) => {
         return next(new ErrorHandler("Invalid email or password.", 401));  
     }
 
+    //   if (user.isBlocked) {
+    //     return next(
+    //         new ErrorHandler(
+    //             "Your account has been blocked by admin. Please contact support.",
+    //             403
+    //         )
+    //     );
+    // }
+
+
+
     const isPasswordMatched = await bcrypt.compare(password, user.password);
     if(!isPasswordMatched){
         return next(new ErrorHandler("Invalid email or password.", 401));  
@@ -139,6 +150,18 @@ export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
         email: req.body.email,
         accountVerified: true,
     });
+
+
+     // ✅ BLOCK CHECK
+if (user && user.isBlocked) {
+    return next(
+        new ErrorHandler(
+            "Your account is blocked. Contact admin.",
+            403
+        )
+    );
+}
+
    
     if(!user){
         return next(new ErrorHandler("Invalid email.", 400));  
@@ -194,6 +217,15 @@ export const resetPassword = catchAsyncErrors(async (req, res, next) => {
 });
 export const updatePassword = catchAsyncErrors(async (req, res, next) => {
     const user = await User.findById(req.user._id).select("+password");
+    // ✅ BLOCK CHECK
+if (user.isBlocked) {
+    return next(
+        new ErrorHandler(
+            "Your account is blocked. Contact admin.",
+            403
+        )
+    );
+}
     const { currentPassword, newPassword, confirmNewPassword } = req.body;
     if(!currentPassword || !newPassword || !confirmNewPassword){
         return next(new ErrorHandler("Please provide all required fields.", 400));  

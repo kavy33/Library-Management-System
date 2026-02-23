@@ -63,4 +63,31 @@ res.status(201).json({
 });
 
 });
-    
+
+export const toggleUserBlock = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return next(new ErrorHandler("User not found", 404));
+    }
+
+    if (user.role === "Admin") {
+      return next(new ErrorHandler("Cannot block an Admin", 400));
+    }
+
+    user.isBlocked = !user.isBlocked;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: user.isBlocked
+        ? "User blocked successfully"
+        : "User unblocked successfully",
+    });
+
+  } catch (error) {
+    return next(new ErrorHandler("Internal Server Error", 500));
+  }
+};
+

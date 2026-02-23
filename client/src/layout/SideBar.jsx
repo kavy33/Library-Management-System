@@ -84,7 +84,7 @@ const SideBar = ({ isSideBarOpen, setIsSideBarOpen}) => {
 >
   <img src={dashboardIcon} alt="icon" />
   <span>Reports</span>
-</Link>
+</Link> 
           
            <button 
            className="w-full py-2 font-medium

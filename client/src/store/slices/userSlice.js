@@ -29,6 +29,13 @@ const userSlice = createSlice({
         addNewAdminFailed(state){
             state.loading=false;
         },
+        updateUserBlockStatus(state, action) {
+                const user = state.users.find(u => u._id === action.payload);
+          if (user) {
+                 user.isBlocked = !user.isBlocked;
+          }
+        }
+
     }
 });
 
@@ -59,4 +66,23 @@ export const addNewAdmin = (data)=>async(dispatch)=>{
 })
 
 }
+
+export const toggleUserBlock = (id) => async (dispatch) => {
+  try {
+    const { data } = await axios.put(
+      `http://localhost:4000/api/v1/user/block/${id}`,
+      {},
+      { withCredentials: true }
+    );
+
+    dispatch(updateUserBlockStatus(id));
+    toast.success(data.message);
+
+  } catch (error) {
+    toast.error(error.response?.data?.message || "Something went wrong");
+  }
+};
+
+export const { updateUserBlockStatus } = userSlice.actions;
+
 export default userSlice.reducer;

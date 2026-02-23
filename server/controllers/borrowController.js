@@ -27,6 +27,17 @@ export const recordBorrowedBook = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("User not verified.", 403));
   }
 
+  //✅ BLOCK CHECK (NEW)
+if (user.isBlocked) {
+  return next(
+    new ErrorHandler(
+      "Your account has been blocked by admin. You cannot borrow books.",
+      403
+    )
+  );
+}
+
+
   // 🔐 Deposit check
   if (!user.depositPaid) {
     return next(
@@ -169,6 +180,16 @@ if (!book) {
   if (!user) {
     return next(new ErrorHandler("User not found.", 404));
   }
+
+  // ✅ BLOCK CHECK (NEW)
+// if (user.isBlocked) {
+//   return next(
+//     new ErrorHandler(
+//       "Your account has been blocked by admin. Contact support.",
+//       403
+//     )
+//   );
+// }
 
   // 🔍 Find borrowed book in user document
   const borrowedBook = user.borrowedBooks.find(

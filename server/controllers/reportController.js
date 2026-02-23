@@ -34,11 +34,17 @@ export const getAdminReport = async (req, res) => {
   }
 };
 
-export const downloadReportPDF = async (req, res) => {
+export const downloadAdminReportPDF = async (req, res) => {
   try {
+    // 🔥 Generate report data (same as getAdminReport)
     const totalBooks = await Book.countDocuments();
     const totalUsers = await User.countDocuments();
     const totalBorrowed = await Borrow.countDocuments({ returnDate: null });
+
+    const overdueBooks = await Borrow.countDocuments({
+      dueDate: { $lt: new Date() },
+      returnDate: null,
+    });
 
     const revenueData = await Borrow.aggregate([
       { $group: { _id: null, total: { $sum: "$price" } } },
@@ -46,10 +52,15 @@ export const downloadReportPDF = async (req, res) => {
 
     const totalRevenue = revenueData[0]?.total || 0;
 
-    const doc = new PDFDocument({
-      size: "A4",
-      margin: 50,
-    });
+    const report = {
+      totalBooks,
+      totalUsers,
+      totalBorrowed,
+      overdueBooks,
+      totalRevenue,
+    };
+
+    const doc = new PDFDocument({ margin: 50 });
 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
@@ -59,76 +70,62 @@ export const downloadReportPDF = async (req, res) => {
 
     doc.pipe(res);
 
-    // 🔵 HEADER
+    /* ---------- HEADER ---------- */
     doc
-      .fillColor("#0f172a")
-      .fontSize(22)
+      .fontSize(24)
+      .fillColor("#111827")
       .text("BookWorm Library", { align: "center" });
 
-    doc.moveDown(0.5);
-
     doc
-      .fillColor("#334155")
-      .fontSize(16)
+      .moveDown(0.5)
+      .fontSize(14)
+      .fillColor("gray")
       .text("Administrative Report", { align: "center" });
 
     doc.moveDown(1);
 
     doc
-      .strokeColor("#cbd5e1")
-      .lineWidth(1)
-      .moveTo(50, doc.y)
-      .lineTo(550, doc.y)
-      .stroke();
-
-    doc.moveDown(1);
-
-    // 📅 Generated Date
-    doc
+      .fontSize(10)
       .fillColor("black")
-      .fontSize(12)
-      .text(`Generated On: ${new Date().toDateString()}`);
-
-    doc.moveDown(2);
-
-    // 📊 REPORT SECTION
-    doc
-      .fontSize(14)
-      .fillColor("#1e293b")
-      .text("Library Statistics", { underline: true });
+      .text(`Generated On: ${new Date().toDateString()}`, {
+        align: "right",
+      });
 
     doc.moveDown(1);
 
-    const addStat = (label, value) => {
-      doc
-        .fontSize(12)
-        .fillColor("black")
-        .text(label, { continued: true })
-        .fillColor("#0f172a")
-        .text(` ${value}`);
-      doc.moveDown(0.8);
-    };
+    doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
 
-    addStat("Total Books:", totalBooks);
-    addStat("Total Users:", totalUsers);
-    addStat("Currently Borrowed:", totalBorrowed);
-    addStat("Total Revenue:", `₹${totalRevenue}`);
+    doc.moveDown(1.5);
+
+    /* ---------- STATISTICS ---------- */
+    doc.fontSize(16).text("Library Statistics", { underline: true });
+
+    doc.moveDown(1);
+
+    doc.fontSize(12).text(`Total Books: ${report.totalBooks}`);
+    doc.moveDown(0.5);
+    doc.text(`Total Users: ${report.totalUsers}`);
+    doc.moveDown(0.5);
+    doc.text(`Currently Borrowed: ${report.totalBorrowed}`);
+    doc.moveDown(0.5);
+    doc.text(`Overdue Books: ${report.overdueBooks}`);
+    doc.moveDown(0.5);
+    doc.text(`Total Revenue: ₹${report.totalRevenue}`);
 
     doc.moveDown(3);
 
-    // 🔵 FOOTER
     doc
       .fontSize(10)
       .fillColor("gray")
-      .text(
-        "This is a system-generated report from BookWorm Library Management System.",
-        50,
-        750,
-        { align: "center" }
-      );
+      .text("© 2026 BookWorm Library. All rights reserved.", {
+        align: "center",
+      });
 
     doc.end();
   } catch (error) {
-    res.status(500).json({ message: "Error generating report" });
+    res.status(500).json({
+      success: false,
+      message: "Error generating PDF report",
+    });
   }
 };
