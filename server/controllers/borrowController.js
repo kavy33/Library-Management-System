@@ -296,9 +296,11 @@ export const borrowedBooks = catchAsyncErrors(async (req, res, next) => {
  * 🛠 ADMIN → ALL BORROWED BOOKS
  */
 export const getBorrowedBooksForAdmin = catchAsyncErrors(async (req, res, next) => {
-  const borrowedBooks = await Borrow.find();
+  const borrowedBooks = await Borrow.find().populate("book", "title");
   res.status(200).json({
     success: true,
     borrowedBooks,
   });
 });
+
+

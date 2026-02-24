@@ -4,6 +4,7 @@ import cloudinary from "cloudinary";
 import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
 import ErrorHandler from "../middlewares/errorMiddlewares.js";
 import { User } from "../models/userModel.js";
+import { sendEmail } from "../utils/sendEmail.js";
 export const getAllUsers = catchAsyncErrors(async (req, res, next) => {
     const users = await User.find( {accountVerified: true}); 
     res.status(200).json({
@@ -64,30 +65,72 @@ res.status(201).json({
 
 });
 
-export const toggleUserBlock = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.params.id);
+export const toggleUserBlock = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
 
-    if (!user) {
-      return next(new ErrorHandler("User not found", 404));
-    }
-
-    if (user.role === "Admin") {
-      return next(new ErrorHandler("Cannot block an Admin", 400));
-    }
-
-    user.isBlocked = !user.isBlocked;
-    await user.save();
-
-    res.status(200).json({
-      success: true,
-      message: user.isBlocked
-        ? "User blocked successfully"
-        : "User unblocked successfully",
-    });
-
-  } catch (error) {
-    return next(new ErrorHandler("Internal Server Error", 500));
+  if (!user) {
+    return next(new ErrorHandler("User not found", 404));
   }
-};
+
+  // 🚫 Prevent blocking Admin
+  if (user.role === "Admin") {
+    return next(new ErrorHandler("Cannot block an Admin", 400));
+  }
+
+  // Toggle block status
+  user.isBlocked = !user.isBlocked;
+  await user.save();
+
+  // 📧 SEND EMAIL WHEN BLOCKED
+  if (user.isBlocked) {
+    await sendEmail({
+      email: user.email,
+      subject: "Account Suspended - BookWorm Library",
+      message: `
+Dear ${user.name},
+
+We regret to inform you that your BookWorm Library account has been temporarily suspended by the administration.
+
+During this time, you will not be able to borrow books or access certain features.
+
+If you believe this action was taken in error or would like clarification, please contact us:
+
+📧 Email: kavypatel19112005@gmail.com
+📞 Phone: +91 8866000601
+
+We are happy to assist you.
+
+Regards,
+BookWorm Library Administration
+      `,
+    });
+  }
+
+  // 📧 SEND EMAIL WHEN UNBLOCKED
+  if (!user.isBlocked) {
+    await sendEmail({
+      email: user.email,
+      subject: "Account Reactivated - BookWorm Library",
+      message: `
+Dear ${user.name},
+
+Good news! Your BookWorm Library account has been reactivated.
+
+You may now continue borrowing books and using our services.
+
+Thank you for your cooperation.
+
+Regards,
+BookWorm Library Team
+      `,
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    message: user.isBlocked
+      ? "User blocked successfully and email sent."
+      : "User unblocked successfully and email sent.",
+  });
+});
 

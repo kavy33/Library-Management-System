@@ -7,6 +7,7 @@ import bookIcon from "../assets/book-square.png";
 import { Pie } from "react-chartjs-2";
 import { useDispatch,useSelector} from "react-redux";
 import Header from "../layout/Header";
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -34,9 +35,12 @@ ChartJS.register(
 );
 
 const UserDashboard = () => {
+ 
    const navigate = useNavigate(); // ✅ add this
   const {settingPopup} = useSelector(state=>state.popup);
    const {userBorrowedBooks} = useSelector(state=>state.borrow);
+  
+  
 
    const [totalBorrowedBooks, setTotalBorrowedBooks] = useState(0);
    const [totalReturnedBooks, setTotalReturnedBooks] = useState(0);
@@ -127,6 +131,8 @@ const UserDashboard = () => {
     </p>
   </div>
 </div>
+
+
 
 
 

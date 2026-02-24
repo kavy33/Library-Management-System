@@ -17,6 +17,9 @@ const Catalog = () => {
   const { returnBookPopup} = useSelector(state => state.popup);
   const { loading,error,allBorrowedBooks, message} = useSelector(state => state.borrow);
 
+  const [searchTerm, setSearchTerm] = useState("");
+const [statusFilter, setStatusFilter] = useState("All");
+
 
   const [filter, setFilter] = useState("borrowed");
 
@@ -53,6 +56,34 @@ const Catalog = () => {
   });
 
   const booksToDisplay = filter === "borrowed" ? borrowedBooks : overdueBooks;
+  const filteredBooks = booksToDisplay?.filter((book) => {
+  const search = searchTerm.toLowerCase();
+
+  // 🔎 Search match (username, email, book title)
+  const matchesSearch =
+    book?.user?.name?.toLowerCase().includes(search) ||
+    book?.user?.email?.toLowerCase().includes(search) ||
+    book?.book?.title?.toLowerCase().includes(search);
+
+  // 📌 Status filter match
+  let matchesStatus = true;
+
+  if (statusFilter === "Returned") {
+    matchesStatus = book.returnDate !== null;
+  }
+
+  if (statusFilter === "NotReturned") {
+    matchesStatus = book.returnDate === null;
+  }
+
+  if (statusFilter === "Overdue") {
+    matchesStatus =
+      book.returnDate === null &&
+      new Date(book.dueDate) < new Date();
+  }
+
+  return matchesSearch && matchesStatus;
+});
 
 
   const [email, setEmail] = useState("");
@@ -110,16 +141,38 @@ useEffect(() => {
              ${filter === "overdue" ? "bg-black text-white border-black"
              : "bg-gray-200 text-black border-gray-200 hover:bg-gray-300"
       }`} onClick={()=>setFilter("overdue")}>Overdue Borrowers</button>
+
+               <input
+  type="text"
+  placeholder="Search by user, email or book..."
+  className="border px-3 py-2 rounded"
+  value={searchTerm}
+  onChange={(e) => setSearchTerm(e.target.value)}
+/>
+<select
+  value={statusFilter}
+  onChange={(e) => setStatusFilter(e.target.value)}
+  className="border px-3 py-2 rounded ml-2"
+>
+  <option value="All">All</option>
+  <option value="Returned">Returned</option>
+  <option value="NotReturned">Not Returned</option>
+  <option value="Overdue">Overdue</option>
+</select>
      </header>
      {
       booksToDisplay && booksToDisplay.length > 0 ? (
         <div className="mt-6 overflow-auto bg-white rounded-md shadow-lg ">
+
+  
+
           <table className="min-w-full border-collapse">
             <thead>
               <tr className="bg-gray-200 ">
                 <th className="px-4 py-2 text-left">ID</th>
                 <th className="px-4 py-2 text-left">Username</th>
                 <th className="px-4 py-2 text-left">Email</th>
+                <th className="px-4 py-2 text-left">Book Name</th>
                 <th className="px-4 py-2 text-left">Price</th>
                 <th className="px-4 py-2 text-left">Due Date</th>
                 <th className="px-4 py-2 text-left">Date & Time</th>
@@ -129,12 +182,13 @@ useEffect(() => {
             </thead>
             <tbody>
               {
-                booksToDisplay.map((book, index)=>(
+                filteredBooks.map((book, index)=>(
                   <tr key={index} className={(index + 1) % 2 === 0 ? "bg-gray-50" : ""}
                   > 
                     <td className="px-4 py-2 ">{index + 1}</td>
                     <td className="px-4 py-2 ">{book?.user.name}</td>
                     <td className="px-4 py-2 ">{book?.user.email}</td>
+                    <td className="px-4 py-2 font-medium">{book?.book?.title}</td>
                     <td className="px-4 py-2 ">{book.price}</td>
                     <td className="px-4 py-2 ">{formatDate(book.dueDate)}</td>
                     <td className="px-4 py-2 ">{formatDateAndTime(book.createdAt)}</td>
