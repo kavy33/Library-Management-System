@@ -4,7 +4,7 @@ import express from "express";
 const router = express.Router(); 
 
 router.post("/admin/add", isAuthenticated, isAuthorized("Admin"), addBook);
-router.get("/all", isAuthenticated, getAllBook);
+router.get("/all",getAllBook);
 router.delete("/admin/delete/:id", isAuthenticated, isAuthorized("Admin"), deleteBook);
 router.put("/admin/update/:id", isAuthenticated, isAuthorized("Admin"), updateBook);
 
