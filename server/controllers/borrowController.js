@@ -38,15 +38,15 @@ if (user.isBlocked) {
 }
 
 
-  // 🔐 Deposit check
-  if (!user.depositPaid) {
-    return next(
-      new ErrorHandler(
-        "Please pay ₹1000 security deposit before borrowing books.",
-        403
-      )
-    );
-  }
+  // 🔐 Security Deposit Check (NEW SYSTEM)
+if (user.wallet.securityDeposit < 1000) {
+  return next(
+    new ErrorHandler(
+      "Please pay ₹1000 security deposit before borrowing books.",
+      403
+    )
+  );
+}
 
   // 🚫 Max 3 books limit
   if (user.rentedBooks.length >= 3) {
@@ -144,9 +144,7 @@ if (book.quantity <= 0) {
 export const returnBorrowBook = catchAsyncErrors(async (req, res, next) => {
   const { borrowId } = req.params;
 
-  // 🔍 Find borrow record first
   const borrow = await Borrow.findById(borrowId);
-
   if (!borrow) {
     return next(new ErrorHandler("Borrow record not found.", 404));
   }
@@ -155,128 +153,106 @@ export const returnBorrowBook = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Book already returned.", 400));
   }
 
-  // 🔍 Find book
-  // 🔍 Find book
-const book = await Book.findById(borrow.book);
-
-if (!book) {
-  // Book was deleted but borrow record exists
-  borrow.returnDate = new Date();
-  borrow.fine = calculateFine(borrow.dueDate);
-  await borrow.save();
-
-  //
-  
-
-  return res.status(200).json({
-    success: true,
-    message: "Book returned (original book record was removed).",
-  });
-}
-
-
-  // 🔍 Find actual user who borrowed
+  const book = await Book.findById(borrow.book);
   const user = await User.findById(borrow.user.id);
+
   if (!user) {
     return next(new ErrorHandler("User not found.", 404));
   }
 
-  // ✅ BLOCK CHECK (NEW)
-// if (user.isBlocked) {
-//   return next(
-//     new ErrorHandler(
-//       "Your account has been blocked by admin. Contact support.",
-//       403
-//     )
-//   );
-// }
-
-  // 🔍 Find borrowed book in user document
-  const borrowedBook = user.borrowedBooks.find(
-    (b) =>
-      b.bookId.toString() === book._id.toString() &&
-      b.returned === false
-  );
-
-  if (!borrowedBook) {
-    return next(new ErrorHandler("This book was not borrowed.", 400));
-  }
-
-  // ✅ Mark returned in user
-  borrowedBook.returned = true;
-
-  // 🧹 Remove from rentedBooks
-  user.rentedBooks = user.rentedBooks.filter(
-    (id) => id.toString() !== book._id.toString()
-  );
-
-  await user.save();
-
- // 📈 Increase stock
-book.quantity += 1;
-book.availability = true;
-
-// 🔥 If someone waiting, notify first user
-if (book.waitingQueue.length > 0) {
-
-  const nextUser = book.waitingQueue[0];
-
-  // Send email
-  await sendEmail({
-    email: nextUser.email,
-    subject: "📚 Book Available Now",
-    message: `Good news! The book "${book.title}" is now available for rent. Please login and borrow it before others.`,
-  });
-
-  // Remove from queue
-  book.waitingQueue.shift();
-}
-
-await book.save();
-
-
-  // 💰 Calculate fine
+  // Mark return date first
   borrow.returnDate = new Date();
+
+  // Calculate fine
   const fine = calculateFine(borrow.dueDate);
   borrow.fine = fine;
 
-  await borrow.save();
-  //email notification at return with fine details
-  // 📧 Send return confirmation email
-await sendEmail({
-  email: user.email,
-  subject: "📚 Book Return Confirmation - BookWorm Library",
-  message: `
-Hello ${user.name},
+  // If book exists → increase stock
+  if (book) {
+    book.quantity += 1;
+    book.availability = true;
+    await book.save();
+  }
 
-Your book "${book.title}" has been successfully returned.
-📅 Borrowed On: ${
-  borrow.borrowedDate
-    ? new Date(borrow.borrowedDate).toDateString()
-    : new Date(borrow.createdAt).toDateString()
+  // Remove from rentedBooks
+  user.rentedBooks = user.rentedBooks.filter(
+    (id) => id.toString() !== borrow.book.toString()
+  );
+
+  const rentalPrice = borrow.price;
+  const totalCharge = rentalPrice + fine;
+
+  // Deduct from wallet
+  if (user.wallet.balance >= totalCharge) {
+    user.wallet.balance -= totalCharge;
+
+    user.wallet.transactions.push({
+      type: "RENTAL",
+      amount: rentalPrice,
+      description: `Rental charge`,
+    });
+
+    if (fine > 0) {
+      user.wallet.transactions.push({
+        type: "FINE",
+        amount: fine,
+        description: "Late fine",
+      });
+    }
+  } else {
+    const remaining = totalCharge - user.wallet.balance;
+
+    if (user.wallet.balance > 0) {
+      user.wallet.transactions.push({
+        type: "RENTAL",
+        amount: user.wallet.balance,
+        description: "Partial payment",
+      });
+
+      user.wallet.balance = 0;
+    }
+
+    user.pendingFine += remaining;
+  }
+
+  // Try deduct pending fine from security deposit
+  if (user.pendingFine > 0) {
+    if (user.wallet.securityDeposit >= user.pendingFine) {
+      user.wallet.securityDeposit -= user.pendingFine;
+
+      user.wallet.transactions.push({
+        type: "FINE",
+        amount: user.pendingFine,
+        description: "Fine deducted from security deposit",
+      });
+
+      user.pendingFine = 0;
+    } else {
+      user.isBlocked = true;
+    }
+  }
+
+  // ✅ Update user borrowedBooks returned flag
+const borrowedEntry = user.borrowedBooks.find(
+  (b) => b.bookId.toString() === borrow.book.toString() && b.returned === false
+);
+
+if (borrowedEntry) {
+  borrowedEntry.returned = true;
 }
 
-📅 Returned On: ${
-  borrow.returnDate ? new Date(borrow.returnDate).toDateString() : "N/A"
-}
-💰 Rental Price: ₹${book.price}
-${fine > 0 ? `⚠ Late Fine: ₹${fine}` : "🎉 No Late Fine!"}
+await user.save();
 
-Total Charge: ₹${fine > 0 ? fine + book.price : book.price}
-
-Thank you for using BookWorm Library.
-
-Regards,
-BookWorm Team
-  `,
-});
+// ✅ Update borrow record
+borrow.returned = true;
+await borrow.save();
 
   res.status(200).json({
     success: true,
     message:
       fine > 0
-        ? `Book returned successfully. Total charge: ₹${fine + book.price}`
-        : `Book returned successfully. Total charge: ₹${book.price}`,
+        ? `Book returned. Total charge: ₹${totalCharge}`
+        : `Book returned successfully.`,
     fine,
   });
 });

@@ -90,11 +90,11 @@ const BookManagement = () => {
       return;
     }
 
-    if (!user.depositPaid) {
-      toast.error("Please pay ₹1000 security deposit first");
-      navigate("/deposit");
-      return;
-    }
+    if (user?.wallet?.securityDeposit < 1000) {
+  toast.error("Please pay ₹1000 security deposit first");
+  navigate("/deposit");
+  return;
+}
 
     if (user.rentedBooks?.length >= 3) {
       toast.error("You can rent only 3 books at a time");

@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Wallet } from "lucide-react";
 
 import logo_with_title from "../assets/logo-with-title.png";
 import logoutIcon from "../assets/logout.png";
@@ -19,6 +20,7 @@ import {
 } from "../store/slices/popUpSlice";
 import AddNewAdmin from "../popups/AddNewAdmin";
 import SettingPopup from "../popups/SettingPopup";
+import { BarChart3 } from "lucide-react";
 
 const SideBar = ({ isSideBarOpen, setIsSideBarOpen }) => {
   const navigate = useNavigate();
@@ -103,6 +105,14 @@ const SideBar = ({ isSideBarOpen, setIsSideBarOpen }) => {
                             <span>Reports</span>
                          </Link> 
 
+                         <Link
+                          to="/admin/analytics"
+                          className="w-full py-2 font-medium bg-transparent rounded-md hover:cursor-pointer flex items-center space-x-2"
+                        >
+                 <BarChart3 size={18} />
+                <span>Payment Analytics</span>
+               </Link>
+
               <button
                 className="w-full py-2 font-medium bg-transparent rounded-md hover:cursor-pointer flex items-center space-x-2"
                 onClick={() => dispatch(toggleAddNewAdminPopup())}
@@ -115,6 +125,7 @@ const SideBar = ({ isSideBarOpen, setIsSideBarOpen }) => {
 
           {/* USER LINKS: Only show if User */}
           {isAuthenticated && user?.role === "User" && (
+            <>
             <Link
               to="/my-borrowed-books"
               className="w-full py-2 font-medium bg-transparent rounded-md hover:cursor-pointer flex items-center space-x-2"
@@ -122,6 +133,17 @@ const SideBar = ({ isSideBarOpen, setIsSideBarOpen }) => {
               <img src={catalogIcon} alt="icon" />
               <span>My Borrowed Books</span>
             </Link>
+
+             <Link
+  to="/wallet"
+  className="w-full py-2 font-medium bg-transparent rounded-md hover:cursor-pointer flex items-center space-x-2"
+>
+  <Wallet size={20} />
+  <span>My Wallet</span>
+</Link>
+</>
+
+            
           )}
 
           {/* SETTINGS: Only show if logged in */}

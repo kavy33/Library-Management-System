@@ -1,4 +1,4 @@
-import axios from "axios";
+import API from "../utils/axiosConfig";
 import { toast } from "react-toastify";
 
 const loadRazorpay = () => {
@@ -19,11 +19,9 @@ const DepositPayment = () => {
       return;
     }
 
-    const { data: order } = await axios.post(
-      "/api/payment/create-order",
-      {},
-      { withCredentials: true }
-    );
+  const { data: order } = await API.post(
+  "/api/v1/payment/create-order"
+);
 
     const options = {
       key: import.meta.env.VITE_RAZORPAY_KEY,
@@ -34,11 +32,10 @@ const DepositPayment = () => {
       order_id: order.id,
 
       handler: async function (response) {
-        await axios.post(
-          "/api/payment/verify",
-          response,
-          { withCredentials: true }
-        );
+       await API.post(
+  "/api/v1/payment/verify",
+  response
+);
 
         toast.success("Deposit paid successfully");
         window.location.href = "/books";

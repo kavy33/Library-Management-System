@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import Header from "../layout/Header";
 
 const AdminReports = () => {
   const [report, setReport] = useState(null);
@@ -23,6 +24,8 @@ const AdminReports = () => {
   if (!report) return <h2>Loading Report...</h2>;
 
   return (
+    <main className="relative flex-1 p-5 pt-28 ">
+    <Header />
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-6xl mx-auto">
 
@@ -93,6 +96,7 @@ const AdminReports = () => {
 
       </div>
     </div>
+      </main>
   );
 }
 

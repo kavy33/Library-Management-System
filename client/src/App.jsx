@@ -31,6 +31,8 @@ import {
 } from "./store/slices/borrowSlice.js";
 import Deposit from "./pages/Deposit.jsx";
 import AdminReports from "./pages/AdminReports";
+import Wallet from "./pages/Wallet";
+import AdminPaymentAnalytics from "./pages/admin/AdminPaymentAnalytics";
 
 const App = () => {
   const { user } = useSelector((state) => state.auth);
@@ -80,6 +82,8 @@ const App = () => {
           <Route path="users" element={<Users />} />
           <Route path="my-borrowed-books" element={<MyBorrowedBooks />} />
           <Route path="admin/reports" element={<AdminReports />} />
+          <Route path="/wallet" element={<Wallet />} />
+          <Route path="/admin/analytics" element={<AdminPaymentAnalytics />} />
         </Route>
 
         {/* Auth */}
@@ -88,6 +92,7 @@ const App = () => {
         <Route path="/password/forgot" element={<ForgotPassword />} />
         <Route path="/otp-verification/:email" element={<OTP />} />
         <Route path="/password/reset/:token" element={<ResetPassword />} />
+        
       </Routes>
 
       <ToastContainer theme="dark" />

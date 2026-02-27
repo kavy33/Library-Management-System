@@ -28,11 +28,39 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    // 🔐 payment & rent rules
-  depositPaid: {
-    type: Boolean,
-    default: false,
+    // 💰 WALLET SYSTEM
+wallet: {
+  balance: {
+    type: Number,
+    default: 0,
   },
+  securityDeposit: {
+    type: Number,
+    default: 0,
+  },
+  transactions: [
+    {
+      type: {
+        type: String,
+        enum: ["DEPOSIT", "RECHARGE", "RENTAL", "FINE", "REFUND","DEPOSIT_REFUND"],
+      },
+      amount: Number,
+      description: String,
+       createdAt: {
+      type: Date,
+      default: Date.now
+    }
+     
+    },
+  ],
+  
+},
+
+pendingFine: {
+  type: Number,
+  default: 0,
+},
+
   isBlocked: {
        type: Boolean,
        default: false,

@@ -15,6 +15,8 @@ import { notifyUsers } from "./services/notifyUsers.js";
 import { removeUnverifiedAccounts } from "./services/removeUnverifiedAccounts.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
+import walletRoutes from "./routes/walletRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 config();
 
 
@@ -40,9 +42,11 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/book", bookRouter);
 app.use("/api/v1/borrow", borrowRouter);
 app.use("/api/v1/user", userRouter);
-app.use("/api/payment", paymentRoutes);
+app.use("/api/v1/payment", paymentRoutes);;
 app.use("/uploads", express.static("uploads"));
 app.use("/api/v1/reports", reportRoutes);
+app.use("/api/v1/wallet", walletRoutes);
+app.use("/api/v1/admin", adminRoutes);
 
 
 

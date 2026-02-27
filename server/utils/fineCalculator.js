@@ -1,11 +1,25 @@
-export const calculateFine = (dueDate) => {
-    const finePerHour = 0.1; //10 Cent
-    const today = new Date();
-    if(today > dueDate){
-        const lateHours = Math.ceil((today - dueDate) / (1000 * 60 * 60));
-        const fine = lateHours * finePerHour;
-        return fine;
-    }
-    return 0;
+export const calculateFine = (dueDate, bookPrice) => {
+  const today = new Date();
 
-}
+  // Grace period: 1 day
+  const gracePeriodInMs = 24 * 60 * 60 * 1000;
+
+  if (today <= new Date(dueDate).getTime() + gracePeriodInMs) {
+    return 0;
+  }
+
+  const diffInMs = today - dueDate;
+
+  const lateDays = Math.ceil(diffInMs / (1000 * 60 * 60 * 24));
+
+  const finePerDay = 10; // ₹10 per day
+
+  let fine = lateDays * finePerDay;
+
+  // Maximum fine cap (cannot exceed book price)
+  if (fine > bookPrice) {
+    fine = bookPrice;
+  }
+
+  return fine;
+};
