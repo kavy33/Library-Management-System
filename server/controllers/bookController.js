@@ -8,6 +8,7 @@ import cloudinary from "../config/cloudinary.js";
 export const addBook = catchAsyncErrors(async (req, res, next) => {
     const { title, author, description, price, quantity, category } = req.body;
 
+
     if (!title || !author || !description || !price || !quantity || !category) {
         return next(new ErrorHandler("Please provide all required fields", 400));
     }
@@ -150,6 +151,98 @@ export const updateBook = catchAsyncErrors(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: "Book updated successfully",
+    book,
+  });
+});
+
+export const addReview = catchAsyncErrors(async (req, res, next) => {
+  let { rating, comment } = req.body;
+  rating = Math.min(Math.max(Number(rating), 1), 5);
+
+ 
+
+  const book = await Book.findById(req.params.id);
+  if (!book) {
+    return next(new ErrorHandler("Book not found", 404));
+  }
+
+  const alreadyReviewed = book.ratings.find(
+    (r) => r.user.toString() === req.user._id.toString()
+  );
+
+  if (alreadyReviewed) {
+    alreadyReviewed.rating = Math.min(Math.max(rating, 1), 5); // ensure rating stays between 1 and 5
+    alreadyReviewed.comment = comment;
+  } else {
+    book.ratings.push({
+      user: req.user._id,
+      name: req.user.name,
+      email: req.user.email,
+      rating: Math.min(Math.max(rating, 1), 5), // ensure rating stays between 1 and 5
+      comment,
+      verifiedBorrow: true,
+    });
+  }
+
+  book.numReviews = book.ratings.length;
+
+  const total = book.ratings.reduce((acc, item) => {
+  const safeRating = Math.min(Math.max(item.rating, 1), 5);
+  return acc + safeRating;
+}, 0);
+
+book.averageRating =
+  book.ratings.length > 0
+    ? total / book.ratings.length
+    : 0;
+
+  await book.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Review submitted successfully",
+  });
+});
+export const deleteReview = catchAsyncErrors(async (req, res, next) => {
+  const { bookId, reviewId } = req.params;
+  const book = await Book.findById(bookId);
+
+  
+
+  if (!book) {
+    return next(new ErrorHandler("Book not found", 404));
+  }
+
+  // Filter out the review
+  const updatedRatings = book.ratings.filter(
+    (review) => review._id.toString() !== reviewId
+  );
+
+  book.ratings = updatedRatings;
+  book.numReviews = updatedRatings.length;
+
+  book.averageRating =
+    updatedRatings.length === 0
+      ? 0
+      : updatedRatings.reduce((acc, item) => acc + item.rating, 0) /
+        updatedRatings.length;
+
+  await book.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Review deleted successfully",
+  });
+});
+export const getBookReviews = catchAsyncErrors(async (req, res, next) => {
+  const book = await Book.findById(req.params.id);
+
+  if (!book) {
+    return next(new ErrorHandler("Book not found", 404));
+  }
+
+  res.status(200).json({
+    success: true,
     book,
   });
 });

@@ -49,6 +49,42 @@ const bookSchema = new mongoose.Schema({
    url: String,
 },
 
+ratings: [
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    name: String,
+    email: String,
+    rating: {
+      type: Number,
+      required: true,
+    },
+    comment: {
+      type: String,
+      required: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+    verifiedBorrow: {
+      type: Boolean,
+      default: true,
+    }
+  },
+],
+averageRating: {
+  type: Number,
+  default: 0,
+},
+numReviews: {
+  type: Number,
+  default: 0,
+},
+
 
     waitingQueue: [
   {
