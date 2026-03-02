@@ -85,6 +85,11 @@ if (book.quantity <= 0) {
     user: user._id,
     email: user.email,
   });
+user.notifications.push({
+  message: `You have been added to waiting queue for "${book.title}".`,
+  type: "INFO",
+});
+
 
   await book.save();
 
@@ -130,6 +135,11 @@ if (book.quantity <= 0) {
   });
 
   user.rentedBooks.push(book._id);
+  user.notifications.push({
+  message: `You borrowed "${book.title}". Please return before ${dueDate.toDateString()}.`,
+  type: "INFO",
+});
+
   await user.save();
 
   res.status(201).json({
@@ -239,6 +249,18 @@ const borrowedEntry = user.borrowedBooks.find(
 
 if (borrowedEntry) {
   borrowedEntry.returned = true;
+}
+
+if (fine > 0) {
+  user.notifications.push({
+    message: `You returned "${book.title}". Total charge ₹${totalCharge} (including ₹${fine} fine).`,
+    type: "WARNING",
+  });
+} else {
+  user.notifications.push({
+    message: `You returned "${book.title}" successfully.`,
+    type: "SUCCESS",
+  });
 }
 
 await user.save();

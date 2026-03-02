@@ -132,10 +132,17 @@ router.post("/wallet/verify", isAuthenticated, async (req, res, next) => {
 
     user.wallet.balance += Number(amount);
 
+
+
     user.wallet.transactions.push({
       type: "RECHARGE",
       amount: Number(amount),
       description: "Wallet recharge via Razorpay",
+    });
+
+     user.notifications.push({
+      message: `Wallet recharged successfully with ₹${amount}`,
+      type: "SUCCESS",
     });
 
     await user.save();

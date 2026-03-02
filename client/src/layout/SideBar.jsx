@@ -22,6 +22,7 @@ import AddNewAdmin from "../popups/AddNewAdmin";
 import SettingPopup from "../popups/SettingPopup";
 import { BarChart3 } from "lucide-react";
 import { History } from "lucide-react"; // 👈 Add this
+import { Bell } from "lucide-react";
 const SideBar = ({ isSideBarOpen, setIsSideBarOpen }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -149,6 +150,14 @@ const SideBar = ({ isSideBarOpen, setIsSideBarOpen }) => {
 >
   <Wallet size={20} />
   <span>My Wallet</span>
+</Link>
+
+<Link
+  to="/notifications"
+  className="w-full py-2 font-medium bg-transparent rounded-md hover:cursor-pointer flex items-center space-x-2"
+>
+  <Bell className="w-5 h-5" />
+  <span>Notifications</span>
 </Link>
 </>
 

@@ -31,6 +31,12 @@ export const rechargeWallet = catchAsyncErrors(async (req, res, next) => {
     description: "Wallet recharge",
   });
 
+  user.notifications.push({
+  message: `Wallet recharged successfully with ₹${amount}`,
+  type: "SUCCESS"
+});
+
+
   await user.save();
 
   res.status(200).json({
@@ -38,6 +44,7 @@ export const rechargeWallet = catchAsyncErrors(async (req, res, next) => {
     message: "Wallet recharged successfully",
     balance: user.wallet.balance,
   });
+
 });
 
 // 💸 Pay pending fine
@@ -47,8 +54,8 @@ export const payPendingFine = catchAsyncErrors(async (req, res, next) => {
   if (user.wallet.balance < user.pendingFine) {
     return next(new ErrorHandler("Insufficient wallet balance", 400));
   }
-
-  user.wallet.balance -= user.pendingFine;
+  const fineAmount = user.pendingFine;
+  user.wallet.balance -= fineAmount;
 
   user.wallet.transactions.push({
     type: "FINE",
@@ -58,6 +65,10 @@ export const payPendingFine = catchAsyncErrors(async (req, res, next) => {
 
   user.pendingFine = 0;
 
+  user.notifications.push({
+  message: `Fine of ₹${fineAmount} has been applied.`,
+  type: "WARNING"
+});
   await user.save();
 
   res.status(200).json({

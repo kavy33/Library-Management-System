@@ -17,6 +17,7 @@ import paymentRoutes from "./routes/paymentRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
 import walletRoutes from "./routes/walletRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
 config();
 
 
@@ -48,7 +49,7 @@ app.use("/uploads", express.static("uploads"));
 app.use("/api/v1/reports", reportRoutes);
 app.use("/api/v1/wallet", walletRoutes);
 app.use("/api/v1/admin", adminRoutes);
-
+app.use("/api/v1/notifications", notificationRoutes);
 
 
 

@@ -28,6 +28,29 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+
+
+notifications: [
+  {
+    message: {
+      type: String,
+      required: true
+    },
+    type: {
+      type: String,
+      enum: ["SUCCESS", "WARNING", "INFO"],
+      required: true
+    },
+    isRead: {
+      type: Boolean,
+      default: false
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    }
+  }
+],
     // 💰 WALLET SYSTEM
 wallet: {
   balance: {
