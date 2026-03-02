@@ -33,6 +33,7 @@ import Deposit from "./pages/Deposit.jsx";
 import AdminReports from "./pages/AdminReports";
 import Wallet from "./pages/Wallet";
 import AdminPaymentAnalytics from "./pages/admin/AdminPaymentAnalytics";
+import AdminPaymentHistory from "./pages/admin/AdminPaymentHistory";
 
 const App = () => {
   const { user } = useSelector((state) => state.auth);
@@ -84,6 +85,7 @@ const App = () => {
           <Route path="admin/reports" element={<AdminReports />} />
           <Route path="/wallet" element={<Wallet />} />
           <Route path="/admin/analytics" element={<AdminPaymentAnalytics />} />
+          <Route path="/admin/payment-history" element={<AdminPaymentHistory />} />
         </Route>
 
         {/* Auth */}

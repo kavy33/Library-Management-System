@@ -42,11 +42,13 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/book", bookRouter);
 app.use("/api/v1/borrow", borrowRouter);
 app.use("/api/v1/user", userRouter);
-app.use("/api/v1/payment", paymentRoutes);;
+app.use("/api/v1/payment", paymentRoutes);
+app.use("/api/v1/payment/admin/transactions", paymentRoutes);
 app.use("/uploads", express.static("uploads"));
 app.use("/api/v1/reports", reportRoutes);
 app.use("/api/v1/wallet", walletRoutes);
 app.use("/api/v1/admin", adminRoutes);
+
 
 
 

@@ -21,7 +21,7 @@ import {
 import AddNewAdmin from "../popups/AddNewAdmin";
 import SettingPopup from "../popups/SettingPopup";
 import { BarChart3 } from "lucide-react";
-
+import { History } from "lucide-react"; // 👈 Add this
 const SideBar = ({ isSideBarOpen, setIsSideBarOpen }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -104,6 +104,13 @@ const SideBar = ({ isSideBarOpen, setIsSideBarOpen }) => {
                               <img src={dashboardIcon} alt="icon" />
                             <span>Reports</span>
                          </Link> 
+                             <Link to="/admin/payment-history"
+                               className="w-full py-2 font-medium bg-transparent rounded-md hover:cursor-pointer flex items-center space-x-2"
+                              >
+                                
+                                 <History className="w-5 h-5 shrink-0" />
+                                 <span>Payment History</span>
+                                  </Link>
 
                          <Link
                           to="/admin/analytics"
@@ -112,6 +119,8 @@ const SideBar = ({ isSideBarOpen, setIsSideBarOpen }) => {
                  <BarChart3 size={18} />
                 <span>Payment Analytics</span>
                </Link>
+
+           
 
               <button
                 className="w-full py-2 font-medium bg-transparent rounded-md hover:cursor-pointer flex items-center space-x-2"

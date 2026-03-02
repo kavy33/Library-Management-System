@@ -2,7 +2,8 @@ import express from "express";
 import crypto from "crypto";
 import Razorpay from "razorpay";
 import { User } from "../models/userModel.js";
-import { isAuthenticated } from "../middlewares/authMiddleware.js";
+import { isAuthenticated, isAuthorized } from "../middlewares/authMiddleware.js";
+import { getAllTransactions } from "../controllers/adminAnalyticsController.js";
 
 const router = express.Router();
 
@@ -149,5 +150,7 @@ router.post("/wallet/verify", isAuthenticated, async (req, res, next) => {
     next(error);
   }
 });
+
+router.get("/admin/transactions", isAuthenticated, isAuthorized("Admin"), getAllTransactions);
 
 export default router;

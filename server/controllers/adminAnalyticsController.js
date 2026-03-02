@@ -46,20 +46,18 @@ export const getPaymentAnalytics = async (req, res, next) => {
     next(error);
   }
 };
-export const getMonthlyRevenue = async (req, res, next) => {
+export const getMonthlyRevenue = async (req, res) => {
   try {
     const data = await User.aggregate([
-      {
-        $match: {
-          "wallet.transactions": { $exists: true, $ne: [] }
-        }
-      },
       { $unwind: "$wallet.transactions" },
+
       {
         $match: {
-          "wallet.transactions.type": { $in: ["RENTAL", "FINE"] }
+          "wallet.transactions.type": { $in: ["RENTAL", "FINE"] },
+          "wallet.transactions.createdAt": { $type: "date" }
         }
       },
+
       {
         $group: {
           _id: {
@@ -69,13 +67,13 @@ export const getMonthlyRevenue = async (req, res, next) => {
           totalRevenue: { $sum: "$wallet.transactions.amount" }
         }
       },
+
       { $sort: { "_id.year": 1, "_id.month": 1 } }
     ]);
 
     res.status(200).json({ success: true, data });
 
   } catch (error) {
-    console.error(error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -183,6 +181,27 @@ export const getRefundStats = async (req, res, next) => {
 
     res.status(200).json({ success: true, data });
 
+  } catch (error) {
+    next(error);
+  }
+};
+export const getAllTransactions = async (req, res, next) => {
+  try {
+    const data = await User.aggregate([
+      { $unwind: "$wallet.transactions" },
+      {
+        $project: {
+          name: 1,
+          email: 1,
+          type: "$wallet.transactions.type",
+          amount: "$wallet.transactions.amount",
+          createdAt: "$wallet.transactions.createdAt"
+        }
+      },
+      { $sort: { createdAt: -1 } }
+    ]);
+
+    res.status(200).json({ success: true, data });
   } catch (error) {
     next(error);
   }
