@@ -6,13 +6,14 @@ import { User } from "../models/userModel.js";
 
 export const getMyNotifications = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user._id).select("notifications");
+    const user = await User.findById(req.user._id);
+     const unreadCount = user.notifications.filter(n => !n.isRead).length;
 
     res.status(200).json({
       success: true,
-      notifications: user.notifications.sort(
-        (a, b) => b.createdAt - a.createdAt
-      )
+      notifications: user.notifications.reverse(),
+        unreadCount,
+      
     });
 
   } catch (error) {
@@ -30,13 +31,9 @@ export const markNotificationAsRead = async (req, res, next) => {
 
     const user = await User.findById(req.user._id);
 
-    const notification = user.notifications.id(notificationId);
-
-    if (!notification) {
-      return res.status(404).json({ message: "Notification not found" });
-    }
-
-    notification.isRead = true;
+    user.notifications.forEach(n => {
+    n.isRead = true;
+  });
 
     await user.save();
 

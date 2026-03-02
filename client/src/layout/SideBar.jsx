@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { Wallet } from "lucide-react";
-
+import API from "../utils/axiosConfig";
 import logo_with_title from "../assets/logo-with-title.png";
 import logoutIcon from "../assets/logout.png";
 import closeIcon from "../assets/white-close-icon.png";
@@ -23,7 +23,25 @@ import SettingPopup from "../popups/SettingPopup";
 import { BarChart3 } from "lucide-react";
 import { History } from "lucide-react"; // 👈 Add this
 import { Bell } from "lucide-react";
+import { useLocation } from "react-router-dom";
 const SideBar = ({ isSideBarOpen, setIsSideBarOpen }) => {
+  const location = useLocation();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+useEffect(() => {
+  fetchUnread();
+}, [location.pathname]);
+
+const fetchUnread = async () => {
+  try {
+    const res = await API.get("/api/v1/notifications/my");
+    setUnreadCount(res.data.unreadCount);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { addNewAdminPopup, settingPopup } = useSelector(
@@ -152,12 +170,20 @@ const SideBar = ({ isSideBarOpen, setIsSideBarOpen }) => {
   <span>My Wallet</span>
 </Link>
 
-<Link
+ <Link
   to="/notifications"
-  className="w-full py-2 font-medium bg-transparent rounded-md hover:cursor-pointer flex items-center space-x-2"
+  className="flex items-center justify-between w-full py-2 font-medium hover:cursor-pointer"
 >
-  <Bell className="w-5 h-5" />
-  <span>Notifications</span>
+  <div className="flex items-center gap-3">
+    <Bell size={20} />
+    <span>Notifications</span>
+  </div>
+
+  {unreadCount > 0 && location.pathname !== "/notifications" && (
+    <span className="bg-red-600 text-white text-xs font-semibold px-2 py-[2px] rounded-full min-w-[20px] text-center">
+      {unreadCount > 99 ? "99+" : unreadCount}
+    </span>
+  )}
 </Link>
 </>
 

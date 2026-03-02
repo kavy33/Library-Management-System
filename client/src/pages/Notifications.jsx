@@ -5,20 +5,23 @@ import Header from "../layout/Header";
 const Notifications = () => {
 
   const [notifications, setNotifications] = useState([]);
+  
 
   useEffect(() => {
-    API.get("/api/v1/notifications/my")
-      .then(res => setNotifications(res.data.notifications));
-  }, []);
+  fetchNotifications();
+  markAllAsRead(); // 🔔 auto mark as read when page opens
+}, []);
 
-  const markAsRead = async (id) => {
-    await API.put(`/api/v1/notifications/read/${id}`);
-    setNotifications(prev =>
-      prev.map(n =>
-        n._id === id ? { ...n, isRead: true } : n
-      )
-    );
-  };
+const fetchNotifications = async () => {
+  const res = await API.get("/api/v1/notifications/my");
+  setNotifications(res.data.notifications);
+};
+
+const markAllAsRead = async () => {
+  await API.put("/api/v1/notifications/read-all");
+};
+
+ 
 
   return (
     <main className="relative flex-1 p-5 pt-28 ">
@@ -38,7 +41,7 @@ const Notifications = () => {
           className={`p-4 mb-3 rounded shadow cursor-pointer
             ${note.isRead ? "bg-white" : "bg-blue-50"}
           `}
-          onClick={() => markAsRead(note._id)}
+        
         >
           <p className="font-medium">{note.message}</p>
           <p className="text-sm text-gray-500">
