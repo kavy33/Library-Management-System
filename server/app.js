@@ -18,6 +18,7 @@ import reportRoutes from "./routes/reportRoutes.js";
 import walletRoutes from "./routes/walletRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
+import userReportRoutes from "./routes/userReportRoutes.js";
 config();
 
 
@@ -50,6 +51,7 @@ app.use("/api/v1/reports", reportRoutes);
 app.use("/api/v1/wallet", walletRoutes);
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/notifications", notificationRoutes);
+app.use("/api/v1/user-reports", userReportRoutes);
 
 
 
