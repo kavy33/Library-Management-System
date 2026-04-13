@@ -3,8 +3,11 @@ import API from "../utils/axiosConfig";
 import { FaStar } from "react-icons/fa";
 import { Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
+
 
 const AdminReviewDashboard = ({ bookId, onClose }) => {
+ const { user } = useSelector((state) => state.auth);
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -150,16 +153,18 @@ const handleDelete = async () => {
 </div>
 
         {/* 🗑 Delete */}
-        <button
-          onClick={() => {
-  setSelectedReviewId(review._id);
-  setDeleteModal(true);
-}}
-          className="text-gray-400 hover:text-red-500 transition"
-          title="Delete Review"
-        >
-          <Trash2 size={18} />
-        </button>
+      {user?.role?.toLowerCase() === "admin" && (
+  <button
+    onClick={() => {
+      setSelectedReviewId(review._id);
+      setDeleteModal(true);
+    }}
+    className="text-gray-400 hover:text-red-500 transition"
+    title="Delete Review"
+  >
+    <Trash2 size={18} />
+  </button>
+)}
 
       </div>
     </div>

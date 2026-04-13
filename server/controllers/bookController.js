@@ -12,8 +12,6 @@ export const addBook = catchAsyncErrors(async (req, res, next) => {
     if (!title || !author || !description || !price || !quantity || !category) {
         return next(new ErrorHandler("Please provide all required fields", 400));
     }
-
-    // 🔥 Prevent duplicate books (safe check)
     const existingBook = await Book.findOne({ 
         title: { $regex: `^${title}$`, $options: "i" },
          author: { $regex: `^${author}$`, $options: "i" },
@@ -204,6 +202,12 @@ book.averageRating =
   });
 });
 export const deleteReview = catchAsyncErrors(async (req, res, next) => {
+
+
+  // 🔥 ADD THIS
+  if (req.user.role.toLowerCase() !== "admin") {
+    return next(new ErrorHandler("Only admin can delete reviews", 403));
+  }
   const { bookId, reviewId } = req.params;
   const book = await Book.findById(bookId);
 

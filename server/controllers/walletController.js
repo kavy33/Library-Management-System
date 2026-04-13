@@ -13,7 +13,8 @@ export const getMyWallet = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-// 💰 Recharge wallet
+
+
 export const rechargeWallet = catchAsyncErrors(async (req, res, next) => {
   const { amount } = req.body;
 
